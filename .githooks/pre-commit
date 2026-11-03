@@ -1,0 +1,3 @@
+#!/bin/sh
+# Frena el commit si cambió el plugin y no subió la versión (ver CLAUDE.md).
+node tools/verificar-version.mjs || exit 1

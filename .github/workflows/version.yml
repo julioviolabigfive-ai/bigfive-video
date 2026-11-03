@@ -1,0 +1,21 @@
+# Regla de versiones (ver CLAUDE.md): si cambia el plugin y no sube la versión, las PCs del equipo no reciben el cambio.
+name: Versión del plugin
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verificar que la versión subió
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then BASE="HEAD~1"; fi
+          node tools/verificar-version.mjs "$BASE"

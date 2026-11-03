@@ -1,5 +1,8 @@
 # Editor de videos BigFive para Claude Code
 
+> [!IMPORTANT]
+> **Si vas a modificar este repo: subí la versión en cada cambio.** Las PCs del equipo se actualizan solas solo si el número sube. Cambiá el mismo número en `plugins/editor-videos/.claude-plugin/plugin.json` y en `.claude-plugin/marketplace.json`, y corré `node tools/verificar-version.mjs` antes del push. Detalle completo en [CLAUDE.md](CLAUDE.md). GitHub marca en rojo cualquier push que no lo cumpla.
+
 Plugin con la skill `editar-videos-clientes`. Con ella Claude Code edita los videos de BigFive y de sus clientes (VSL en partes, video de confirmación y anuncios verticales) con el mismo motor y las mismas reglas que se usaron en los videos aprobados:
 
 - cortes de silencios, muletillas y tomas repetidas, con fundidos suaves;
@@ -104,7 +107,7 @@ plugins/editor-videos/skills/editar-videos-clientes/
 - **Criterio de cortes:** `scripts/cortar.mjs` (pausa máxima, márgenes, muletillas) y el paso 5 de `SKILL.md`.
 - **Logo:** reemplaza `engine/public/logo.png` por el PNG original ("logo en azul"). El actual se recortó de un video.
 
-Después de cualquier cambio, sube la versión en `plugins/editor-videos/.claude-plugin/plugin.json`, en `.claude-plugin/marketplace.json` y en `engine/package.json`, y publícalo en el repo. Con eso, cada PC instala el motor nuevo en una carpeta aparte.
+Después de cualquier cambio, sube la versión en `plugins/editor-videos/.claude-plugin/plugin.json` y en `.claude-plugin/marketplace.json` (el mismo número). Si cambian las dependencias del motor, sube también `engine/package.json`. Corre `node tools/verificar-version.mjs` y publícalo. La regla completa está en [CLAUDE.md](CLAUDE.md). Para que el chequeo frene los commits en tu PC, actívalo una vez con `git config core.hooksPath .githooks`.
 
 ## Licencias
 
