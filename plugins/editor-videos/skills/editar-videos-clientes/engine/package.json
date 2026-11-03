@@ -1,0 +1,16 @@
+{
+  "name": "bigfive-video-engine",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Motor de edición BigFive (Remotion). Lo instala scripts/setup.mjs; cada proyecto copia src/ y usa estos node_modules.",
+  "dependencies": {
+    "@remotion/cli": "4.0.300",
+    "@remotion/google-fonts": "4.0.300",
+    "@remotion/install-whisper-cpp": "4.0.300",
+    "ffmpeg-static": "5.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.300"
+  }
+}

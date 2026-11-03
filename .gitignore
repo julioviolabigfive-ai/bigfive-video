@@ -1,0 +1,5 @@
+node_modules/
+*.zip
+_edicion/
+*.mp4
+bundle/
