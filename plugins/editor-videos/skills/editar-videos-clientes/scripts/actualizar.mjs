@@ -26,7 +26,7 @@ const mayor = (a, b) => {
   return false;
 };
 const claude = (args) =>
-  spawnSync('claude', args, {encoding: 'utf8', shell: process.platform === 'win32', timeout: 120000});
+  spawnSync(['claude', ...args].join(' '), {encoding: 'utf8', shell: true, timeout: 120000});
 
 const instalada = leerVersion(path.join(SKILL_DIR, '..', '..', '.claude-plugin', 'plugin.json'));
 let known;

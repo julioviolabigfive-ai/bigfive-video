@@ -1,6 +1,6 @@
 {
   "name": "editor-videos",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Edición de videos de BigFive y sus clientes (VSL, confirmación, anuncios y portadas) con el motor Remotion y el estilo aprobados.",
   "author": {"name": "BigFive"}
 }

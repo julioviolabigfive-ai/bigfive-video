@@ -32,7 +32,10 @@ export const ffmpegPath = () => engineRequire()('ffmpeg-static');
 export const run = (cmd, args, opts = {}) => {
   const shell = process.platform === 'win32';
   const q = (a) => (shell && /[\s&()]/.test(a) && !/^".*"$/.test(a) ? `"${a}"` : a);
-  const r = spawnSync(q(cmd), args.map(q), {stdio: 'inherit', shell, ...opts});
+  // Con consola, el comando va armado en un solo texto (pasar la lista con shell genera un aviso de Node).
+  const r = shell
+    ? spawnSync([cmd, ...args].map(q).join(' '), {stdio: 'inherit', shell, ...opts})
+    : spawnSync(cmd, args, {stdio: 'inherit', ...opts});
   if (r.status !== 0) throw new Error(`Falló: ${cmd} ${args.join(' ')}`);
   return r;
 };
