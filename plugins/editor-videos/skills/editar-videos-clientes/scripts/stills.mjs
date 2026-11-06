@@ -8,9 +8,10 @@
 //   ("PortadaAnuncio04" → "Portada Anuncio04.png").
 import fs from 'node:fs';
 import path from 'node:path';
-import {assertEngine, empaquetar, engineRequire, hojaImagenes, parseArgs} from './lib.mjs';
+import {assertEngine, empaquetar, engineRequire, hojaImagenes, mantenerTemporalesLimpios, parseArgs} from './lib.mjs';
 
 assertEngine();
+mantenerTemporalesLimpios();
 const {pos, flags} = parseArgs(process.argv.slice(2));
 const [proyectoArg, comp, ...segs] = pos;
 if (!proyectoArg || (!flags.portadas && (!comp || !segs.length))) {

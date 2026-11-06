@@ -107,6 +107,65 @@ export const empaquetar = async (proyecto) => {
 // Mismos ajustes de imagen que remotion.config.ts (la API no lee ese archivo).
 export const RENDER_OPTS = {codec: 'h264', crf: 16, imageFormat: 'jpeg', jpegQuality: 95};
 
+export const tamanoCarpeta = (dir) => {
+  let n = 0;
+  for (const e of fs.readdirSync(dir, {withFileTypes: true})) {
+    const p = path.join(dir, e.name);
+    n += e.isDirectory() ? tamanoCarpeta(p) : fs.statSync(p).size;
+  }
+  return n;
+};
+
+// Remotion copia los videos de cada render y de cada still a carpetas temporales (remotion-v<versión>-assets…)
+// y no siempre las borra: con el uso se acumulan decenas de GB en la carpeta temporal del sistema.
+const TEMP_REMOTION = /^remotion-v[\d.]+-assets/;
+const temporalesRemotion = () => {
+  try {
+    return fs.readdirSync(os.tmpdir()).filter((n) => TEMP_REMOTION.test(n)).map((n) => path.join(os.tmpdir(), n));
+  } catch {
+    return [];
+  }
+};
+// Una carpeta en uso por un render tiene archivos abiertos y, en Windows, no se puede renombrar. Por eso se renombra
+// antes de borrar: si falla, es de un render en curso y no se toca (ni queda a medio borrar).
+const borrarSiLibre = (p) => {
+  const aparte = `${p}-borrando-${process.pid}`;
+  try {
+    fs.renameSync(p, aparte);
+  } catch {
+    return 0;
+  }
+  let bytes = 0;
+  try {
+    bytes = tamanoCarpeta(aparte);
+  } catch {}
+  fs.rmSync(aparte, {recursive: true, force: true});
+  return bytes;
+};
+// Borra las carpetas temporales de Remotion que no estén en uso: las sin tocar hace más de `minutos` y las de `ademas`.
+// Devuelve los bytes liberados.
+export const limpiarTemporales = (minutos = 2, ademas = new Set()) => {
+  const limite = Date.now() - minutos * 60 * 1000;
+  let bytes = 0;
+  for (const p of temporalesRemotion()) {
+    try {
+      if (!ademas.has(p) && fs.statSync(p).mtimeMs > limite) continue;
+      bytes += borrarSiLibre(p);
+    } catch {} // bloqueada: la borra la próxima limpieza
+  }
+  return bytes;
+};
+// Se llama al empezar cada script que renderiza. Limpia siempre, no solo si algo falla:
+//   - al empezar, borra lo que dejaron usos anteriores, incluidos renders cortados (Claude cerrado, PC apagada);
+//   - al salir, bien o con error, borra las carpetas que creó este render;
+//   - con Ctrl+C o al detener el proceso, sale ordenado para que también se borren.
+export const mantenerTemporalesLimpios = () => {
+  limpiarTemporales();
+  const antes = new Set(temporalesRemotion());
+  process.on('exit', () => limpiarTemporales(2, new Set(temporalesRemotion().filter((p) => !antes.has(p)))));
+  for (const senal of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(senal, () => process.exit(130));
+};
+
 // Capacidad medida de esta PC (calibrar.mjs). Cada script usa el máximo que rinde el equipo.
 export const EQUIPO_FILE = path.join(os.homedir(), '.bigfive-video', 'equipo.json');
 export const equipo = () => {

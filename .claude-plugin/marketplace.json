@@ -7,7 +7,7 @@
       "name": "editor-videos",
       "source": "./plugins/editor-videos",
       "description": "Edición de videos de BigFive y sus clientes: VSL, confirmación, anuncios y portadas con el motor y el estilo aprobados.",
-      "version": "2.0.1"
+      "version": "2.0.2"
     }
   ]
 }

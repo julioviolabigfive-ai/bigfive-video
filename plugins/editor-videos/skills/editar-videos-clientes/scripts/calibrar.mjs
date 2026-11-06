@@ -4,9 +4,10 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {assertEngine, ENGINE_DIR, engineRequire, EQUIPO_FILE, ffmpegOk, RENDER_OPTS} from './lib.mjs';
+import {assertEngine, ENGINE_DIR, engineRequire, EQUIPO_FILE, ffmpegOk, mantenerTemporalesLimpios, RENDER_OPTS} from './lib.mjs';
 
 assertEngine();
+mantenerTemporalesLimpios();
 const nucleos = os.availableParallelism?.() ?? os.cpus().length;
 const ramGb = os.totalmem() / 1024 ** 3;
 

@@ -8,9 +8,10 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {assertEngine, empaquetar, engineRequire, equipo, ffmpegOk, normalizar, parseArgs, RENDER_OPTS} from './lib.mjs';
+import {assertEngine, empaquetar, engineRequire, equipo, ffmpegOk, mantenerTemporalesLimpios, normalizar, parseArgs, RENDER_OPTS} from './lib.mjs';
 
 assertEngine();
+mantenerTemporalesLimpios();
 const {pos, flags} = parseArgs(process.argv.slice(2));
 const [proyectoArg, ...trabajos] = pos;
 if (!proyectoArg || !trabajos.length || trabajos.some((t) => !t.includes('='))) {

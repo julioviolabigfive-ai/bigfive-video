@@ -50,7 +50,7 @@ Basta con pedirlo en lenguaje normal, por ejemplo "quiero editar los videos de A
 4. Con un cliente nuevo, entrega un **piloto** (la primera parte del VSL o un anuncio) y espera el OK.
 5. Edita el resto, entrega en la subcarpeta `Terminados` (`VSL\`, `Confirmacion\`, `Anuncios\` y `Portadas\`) y la abre en el explorador.
 
-Cada sesión tiene sus propias carpetas, así los trabajos no se mezclan. Los archivos intermedios quedan en `_edicion\`, dentro de la misma sesión. Para pedir cambios, alcanza con decirlo en lenguaje simple ("más cálido", "saca la lista del minuto 2"). Claude guarda esas preferencias en `estilo.md`, dentro de la carpeta del cliente.
+Cada sesión tiene sus propias carpetas, así los trabajos no se mezclan. Los archivos intermedios quedan en `_edicion\`, dentro de la misma sesión. La skill se mantiene limpia sola, siempre. Las copias temporales que Remotion deja en la carpeta temporal de Windows se borran al crear cada sesión, al empezar y al terminar cada render (aunque falle o se corte), y al cerrar la entrega, junto con los intermedios que se pueden regenerar. Para pedir cambios, alcanza con decirlo en lenguaje simple ("más cálido", "saca la lista del minuto 2"). Claude guarda esas preferencias en `estilo.md`, dentro de la carpeta del cliente.
 
 ## Actualizaciones
 
@@ -83,6 +83,7 @@ plugins/editor-videos/skills/editar-videos-clientes/
     setup.mjs               instala el motor en %USERPROFILE%\.bigfive-video
     actualizar.mjs          busca e instala versiones nuevas del plugin
     sesion.mjs              crea la carpeta de cada sesión (Crudos y Terminados), abre carpetas y libera espacio
+                            (intermedios de _edicion y temporales de Remotion)
     nuevo-proyecto.mjs      crea el proyecto de la sesión con la paleta y el logo de la marca
     transcribir.mjs         transcripción palabra por palabra
     cortar.mjs              quita silencios, muletillas y tomas, con fundidos (por tramos: memoria acotada)

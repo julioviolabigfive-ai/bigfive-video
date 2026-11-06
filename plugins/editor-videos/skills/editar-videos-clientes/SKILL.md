@@ -63,7 +63,7 @@ Si la versión del motor cambió (por una actualización del plugin), la carpeta
     - qué se corrigió (repeticiones, nombres);
     - **qué textos en pantalla son paráfrasis propias**, para que el usuario los revise.
 13. **Abrir la carpeta de terminados**, siempre: `node "<skill>/scripts/sesion.mjs" abrir "<sesión>\Terminados"`, y dar la ruta en el resumen. Lo mismo al entregar el piloto.
-14. **Liberar espacio** al cerrar la entrega: `node "<skill>/scripts/sesion.mjs" limpiar "<sesión>"` borra el empaquetado y los renders intermedios (se regeneran solos si hay correcciones).
+14. **Liberar espacio** al cerrar la entrega: `node "<skill>/scripts/sesion.mjs" limpiar "<sesión>"` borra el empaquetado y los renders intermedios (se regeneran solos si hay correcciones) y las copias temporales de Remotion que hayan quedado en la carpeta temporal del sistema.
 
 **Piloto obligatorio con cada cliente nuevo:** renderizar la primera parte del VSL (o un anuncio si no hay VSL), entregarla con el brief creativo y el storyboard, y esperar el OK antes de hacer el resto. Con el estilo ya aprobado (por ejemplo, videos de BigFive), entregar todo terminado.
 
@@ -97,4 +97,10 @@ Si la versión del motor cambió (por una actualización del plugin), la carpeta
 - Whisper puede alargar una palabra hasta cubrir la pausa siguiente; `transcribir.mjs` ajusta los bordes con los silencios reales del audio.
 - **Tiempos de referencia** (Ryzen 7 de 8 núcleos): la transcripción tarda alrededor de 1,4 veces la duración del video, el render unos 2,3 s por segundo de video (un VSL de 8 min, unos 20 min) y una hoja de 10 stills unos 20 s. En otras PCs escala con el procesador: avisar al usuario el tiempo estimado antes de un render largo. Si tarda mucho más, revisar que no haya otra transcripción o render corriendo y, en notebooks, que esté enchufada y en modo de alto rendimiento (con batería o caliente puede rendir la mitad). `render.mjs` usa la cantidad de fotogramas en paralelo que midió `calibrar.mjs` en esta PC; si se cambia de equipo o de hardware, `setup.mjs` vuelve a medir. Más hilos, GPU (`--gl=angle`) o presets del codificador no mejoran: el tiempo está en dibujar cada fotograma.
 - **"El motor no está instalado"**: ejecutar el paso 0.
+- **Disco lleno de temporales de Remotion**: cada render y cada still copian los videos a carpetas `remotion-v<versión>-assets…` en la carpeta temporal del sistema, y Remotion no siempre las borra (llegaron a sumar 33 GB). La skill se mantiene limpia sola, sin esperar a que algo falle:
+  - `sesion.mjs nueva` borra lo que haya quedado de usos anteriores;
+  - `render.mjs`, `stills.mjs` y `calibrar.mjs` limpian al empezar y, al terminar (bien, con error o con Ctrl+C), borran las carpetas que crearon;
+  - `sesion.mjs limpiar` barre lo que quede al cerrar la entrega.
+
+  Nunca se toca una carpeta que esté usando un render en curso (la skill lo detecta antes de borrar). No hace falta borrarlas a mano.
 - **El render falla al cargar la fuente**: Remotion descarga Inter de Google Fonts al renderizar, así que hace falta internet.
