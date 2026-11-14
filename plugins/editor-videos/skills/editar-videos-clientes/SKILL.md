@@ -104,3 +104,8 @@ Si la versión del motor cambió (por una actualización del plugin), la carpeta
 
   Nunca se toca una carpeta que esté usando un render en curso (la skill lo detecta antes de borrar). No hace falta borrarlas a mano.
 - **El render falla al cargar la fuente**: Remotion descarga Inter de Google Fonts al renderizar, así que hace falta internet.
+- **"No frame found at position" en el render** (a un segundo distinto cada vez): Remotion no consigue un fotograma del video. Pasa con poca RAM libre (Chrome, WSL u otros programas abiertos) y empeora mucho si el video tiene fotogramas clave muy espaciados: con el valor por defecto de x264 hay uno cada ~10 s y cada búsqueda decodifica hasta 250 fotogramas. Ya está resuelto, no hace falta hacer nada a mano:
+  - `cortar.mjs` entrega el `_cut.mp4` con un fotograma clave por segundo y sin fotogramas B;
+  - `render.mjs` revisa los videos de `public/` antes de empaquetar y recodifica los de proyectos anteriores (o copiados a mano) que tengan los fotogramas clave muy espaciados;
+  - `render.mjs` mira la RAM libre al empezar: cada fotograma en paralelo usa ~0,5 GB, así que con poca memoria baja el paralelo de entrada (y avisa que cerrar programas lo acelera);
+  - si igual aparece el error, `render.mjs` reintenta solo (hasta 3 veces) con la mitad de fotogramas en paralelo y una caché de video explícita. Si falla las 3 veces, cerrar programas que usen mucha memoria y volver a renderizar.

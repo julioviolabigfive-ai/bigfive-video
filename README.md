@@ -86,9 +86,12 @@ plugins/editor-videos/skills/editar-videos-clientes/
                             (intermedios de _edicion y temporales de Remotion)
     nuevo-proyecto.mjs      crea el proyecto de la sesión con la paleta y el logo de la marca
     transcribir.mjs         transcripción palabra por palabra
-    cortar.mjs              quita silencios, muletillas y tomas, con fundidos (por tramos: memoria acotada)
+    cortar.mjs              quita silencios, muletillas y tomas, con fundidos (por tramos: memoria acotada);
+                            entrega el video con un fotograma clave por segundo para que el render no falle
     stills.mjs              fotogramas de control y portadas con un solo empaquetado
-    render.mjs              render final en lote, audio normalizado y VSL unido
+    render.mjs              render final en lote, audio normalizado y VSL unido; ajusta el paralelo a la RAM
+                            libre, recodifica videos de proyectos viejos y reintenta solo si Remotion no
+                            consigue un fotograma
     finalizar.mjs           normaliza o une videos sueltos
     zonas.mjs               mide el encuadre (cabeza y pecho) para que ningún gráfico los tape
     portada.mjs             hoja de fotogramas y extracción del fotograma de portada

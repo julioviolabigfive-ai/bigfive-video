@@ -107,6 +107,41 @@ export const empaquetar = async (proyecto) => {
 // Mismos ajustes de imagen que remotion.config.ts (la API no lee ese archivo).
 export const RENDER_OPTS = {codec: 'h264', crf: 16, imageFormat: 'jpeg', jpegQuality: 95};
 
+// Videos que Remotion lee con <OffthreadVideo>: un fotograma clave por segundo y sin fotogramas B. Con el valor por
+// defecto de x264 (uno cada ~10 s) cada búsqueda decodifica hasta 250 fotogramas; con varios fotogramas en paralelo y
+// poca RAM libre aparece "No frame found at position" a un segundo distinto cada vez.
+export const ENC_BUSQUEDA = ['-g', String(FPS), '-keyint_min', String(FPS), '-bf', '0'];
+
+// Segundos promedio entre fotogramas clave (decodifica solo los clave: tarda poco).
+export const segundosEntreClaves = (file) => {
+  const out = ffmpeg(['-skip_frame', 'nokey', '-i', file, '-map', '0:v:0', '-f', 'null', '-']).stderr;
+  const claves = Number([...out.matchAll(/frame=\s*(\d+)/g)].pop()?.[1] ?? 0);
+  const {duration} = probe(file);
+  return claves ? duration / claves : duration;
+};
+
+// Recodifica en el lugar los videos de public/ con fotogramas clave muy espaciados (proyectos armados con versiones
+// anteriores de cortar.mjs, o videos copiados a mano). Los que ya están bien no se tocan.
+export const prepararVideos = (proyecto) => {
+  const pub = path.join(proyecto, 'public');
+  if (!fs.existsSync(pub)) return;
+  for (const nombre of fs.readdirSync(pub)) {
+    if (!/\.(mp4|mov|m4v|webm)$/i.test(nombre)) continue;
+    const file = path.join(pub, nombre);
+    const cada = segundosEntreClaves(file);
+    if (cada <= 2) continue;
+    const t0 = Date.now();
+    const tmp = path.join(pub, `.${nombre}.recodificando.mp4`);
+    ffmpegOk(['-i', file, '-map', '0:v:0', '-map', '0:a?', '-c:v', 'libx264', '-crf', '14', '-preset', 'fast', ...ENC_BUSQUEDA,
+      '-pix_fmt', 'yuv420p', '-c:a', 'copy', '-movflags', '+faststart', tmp]);
+    fs.renameSync(tmp, file);
+    console.log(`${nombre}: fotogramas clave cada ${cada.toFixed(1)} s → cada 1 s (recodificado en ${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  }
+};
+
+// El error de Remotion cuando <OffthreadVideo> no consigue un fotograma (falta de memoria o búsquedas pesadas).
+export const esErrorDeFotograma = (e) => /No frame found at position|Could not extract frame from compositor/.test(String(e?.message ?? e));
+
 export const tamanoCarpeta = (dir) => {
   let n = 0;
   for (const e of fs.readdirSync(dir, {withFileTypes: true})) {

@@ -13,7 +13,7 @@
 import {spawn} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import {assertEngine, FPS, ffmpegOk, ffmpegPath, paraleloFfmpeg, parseArgs, probe, readJson} from './lib.mjs';
+import {assertEngine, ENC_BUSQUEDA, FPS, ffmpegOk, ffmpegPath, paraleloFfmpeg, parseArgs, probe, readJson} from './lib.mjs';
 
 assertEngine();
 const {flags: a} = parseArgs(process.argv.slice(2));
@@ -114,7 +114,8 @@ const tmp = fs.mkdtempSync(path.join(path.dirname(rem), `${a.id}_tramos_`));
 // Solo el archivo final se arma con video y audio juntos y calidad de entrega.
 const ENC_V = ['-an', '-c:v', 'libx264', '-crf', '10', '-preset', 'ultrafast', '-r', String(FPS), '-pix_fmt', 'yuv420p'];
 const ENC_A = ['-vn', '-c:a', 'pcm_s16le', '-ar', '48000', '-ac', '2'];
-const ENC = ['-c:v', 'libx264', '-crf', '14', '-preset', 'fast', '-r', String(FPS), '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart'];
+// El archivo final lleva un fotograma clave por segundo: Remotion lo lee buscando fotogramas sueltos (ver ENC_BUSQUEDA).
+const ENC = ['-c:v', 'libx264', '-crf', '14', '-preset', 'fast', ...ENC_BUSQUEDA, '-r', String(FPS), '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart'];
 const GRUPO = 12;
 
 const ffmpegAsync = (args) =>
